@@ -1,6 +1,9 @@
+using DOMAIN;
+using INFRA;
 using INFRA.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using SERVICE.ProductService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<MyDbContext>(options =>
 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // configurar serviços, registrar dependências e definir configurações
 var app = builder.Build();

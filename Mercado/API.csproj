@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\INFRA\INFRA.csproj" />
+    <ProjectReference Include="..\SERVICE\SERVICE.csproj" />
   </ItemGroup>
 
 </Project>
