@@ -1,3 +1,4 @@
+using API.Middleware;
 using DOMAIN;
 using INFRA;
 using INFRA.Context;
@@ -30,6 +31,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(o =>
     o.SwaggerEndpoint("/openapi/v1.json", "Nome da api"));
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 
 

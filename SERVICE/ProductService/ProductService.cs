@@ -1,14 +1,7 @@
 ﻿using DOMAIN;
 using DOMAIN.Models.Product;
-using Microsoft.EntityFrameworkCore;
-using SERVICE.Common;
 using SERVICE.ProductService.DTO.Request;
 using SERVICE.ProductService.DTO.Response;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SERVICE.ProductService
 {
@@ -22,14 +15,20 @@ namespace SERVICE.ProductService
             _repository = repository;
         }
 
-        public async Task<Result<ProductCreateResponseDTO>> Create(ProductCreateDTO input)
+        public async Task<ProductCreateResponseDTO> Create(ProductCreateDTO input)
         {
+            if (input is null)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
+
+            if (input.Price <= 0)
+            {
+                throw new ArgumentException("O preço deve ser maior que 0,01", nameof(input.Price));
+            }
+
             try
             {
-                var validationResult = ValidateProductCreateDTO(input);
-                if (!validationResult.Success)
-                    return Result<ProductCreateResponseDTO>.Fail(validationResult.ErrorMessage);
-
                 var product = new Product
                 {
                     Name = input.Name,
@@ -39,32 +38,21 @@ namespace SERVICE.ProductService
 
                 var createdProduct = await _repository.AddAsync(product);
 
-                var response = new ProductCreateResponseDTO
+                return new ProductCreateResponseDTO
                 {
                     Id = createdProduct.Id,
                     Name = createdProduct.Name,
                     Price = createdProduct.Price,
                     Description = createdProduct.Description
                 };
-
-                return Result<ProductCreateResponseDTO>.Ok(response);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Erro ao criar produto: {ex.Message}");
-                return Result<ProductCreateResponseDTO>.Fail("Erro inesperado ao criar o produto.");
+                throw;
             }
         }
 
-        private Result<bool> ValidateProductCreateDTO(ProductCreateDTO input)
-        {
-            if (input == null)
-                return Result<bool>.Fail("Produto não pode ser nulo");
 
-            if (input.Price <= 0)
-                return Result<bool>.Fail("O preço do produto deve ser maior que zero");
 
-            return Result<bool>.Ok(true);
-        }
     }
 }
