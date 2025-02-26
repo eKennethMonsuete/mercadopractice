@@ -52,6 +52,37 @@ namespace SERVICE.ProductService
             }
         }
 
+        public async Task<IEnumerable<ProductGetAllResponseDTO>> FindAllAsync()
+        {
+            var products = await _repository.GetAllAsync();
+            return products.Select(p => new ProductGetAllResponseDTO
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+               // Description = p.Description
+            });
+        }
+
+        public async Task<ProductFindByIdResponse> FindByIdAsync(long id)
+        {
+            var product = await _repository.GetByIdAsync(id);
+
+            if (product == null)
+            {
+                return null; // Retorna null se o produto não for encontrado
+            }
+
+            return (new ProductFindByIdResponse
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Description = product.Description
+
+            });
+        }
+
 
 
     }

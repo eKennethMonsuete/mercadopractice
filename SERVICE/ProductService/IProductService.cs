@@ -13,6 +13,11 @@ namespace SERVICE.ProductService
     {
 
        public Task<ProductCreateResponseDTO> Create(ProductCreateDTO input);
+        public  Task<IEnumerable<ProductGetAllResponseDTO>> FindAllAsync();
+
+        public Task<ProductFindByIdResponse> FindByIdAsync(long id);
+
+
 
     }
 }

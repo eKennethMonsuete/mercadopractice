@@ -29,23 +29,50 @@ namespace INFRA
                                            
         }
 
-       
 
-        public Task<IEnumerable<T>> GetAllAsync()
+
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Set<T>().ToListAsync();
         }
 
-        public Task<T?> GetByIdAsync(int id)
+        public Task<T?> GetByIdAsync(long id)
         {
-            throw new NotImplementedException();
+            return _context.Set<T>().FindAsync(id).AsTask();
         }
 
         public Task UpdateAsync(T entity)
         {
-            throw new NotImplementedException();
+            // Assumindo que T tem uma propriedade Id do tipo long
+            var keyProperty = typeof(T).GetProperty("Id");
+            if (keyProperty == null)
+            {
+                throw new InvalidOperationException("Entity does not have an 'Id' property.");
+            }
+
+            var itemId = (long)keyProperty.GetValue(entity); // Converta para long, ajustando conforme o tipo da chave
+            var result = dbSet.Find(itemId); // Use Find para obter a entidade com base no ID
+
+            if (result != null)
+            {
+                try
+                {
+                    _context.Entry(result).CurrentValues.SetValues(entity);
+                    _context.SaveChanges();
+                    return entity;
+                }
+                catch (Exception ex)
+                {
+                    // Consider logging the exception
+                    throw new InvalidOperationException("Update operation failed.", ex);
+                }
+            }
+            else
+            {
+                throw new KeyNotFoundException("Entity with the given Id was not found.");
+            }
         } 
-        public Task DeleteAsync(T entity)
+        public Task DeleteAsync(long id)
         {
             throw new NotImplementedException();
         }

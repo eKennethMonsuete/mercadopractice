@@ -19,5 +19,12 @@ namespace API.Controllers
 
         [HttpPost]
         public async Task<IActionResult> SaveMeasures([FromBody] ProductCreateDTO input) => Ok(await _productService.Create(input));
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _productService.FindAllAsync());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(long id) => Ok(await _productService.FindByIdAsync(id));
     }
 }
