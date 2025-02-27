@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Mvc;
 using SERVICE.ProductService.DTO.Request;
 using SERVICE.ProductService.DTO.Response;
 using System;
@@ -17,7 +18,9 @@ namespace SERVICE.ProductService
 
         public Task<ProductFindByIdResponse> FindByIdAsync(long id);
 
+         public Task UpdateAsync( long id, ProductUpdateDTO input);
 
+        public void DeleteAsync(long id);
 
     }
 }

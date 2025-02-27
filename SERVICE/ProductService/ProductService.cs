@@ -1,5 +1,7 @@
-﻿using DOMAIN;
+﻿using AutoMapper;
+using DOMAIN;
 using DOMAIN.Models.Product;
+using Microsoft.AspNetCore.Mvc;
 using SERVICE.ProductService.DTO.Request;
 using SERVICE.ProductService.DTO.Response;
 
@@ -9,10 +11,12 @@ namespace SERVICE.ProductService
     {
 
         private readonly IRepository<Product> _repository;
+        private readonly IMapper _mapper;
 
-        public ProductService(IRepository<Product> repository)
+        public ProductService(IRepository<Product> repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         public async Task<ProductCreateResponseDTO> Create(ProductCreateDTO input)
@@ -40,7 +44,7 @@ namespace SERVICE.ProductService
 
                 return new ProductCreateResponseDTO
                 {
-                    Id = createdProduct.Id,
+                   
                     Name = createdProduct.Name,
                     Price = createdProduct.Price,
                     Description = createdProduct.Description
@@ -51,6 +55,8 @@ namespace SERVICE.ProductService
                 throw;
             }
         }
+
+       
 
         public async Task<IEnumerable<ProductGetAllResponseDTO>> FindAllAsync()
         {
@@ -83,7 +89,46 @@ namespace SERVICE.ProductService
             });
         }
 
+        public async Task UpdateAsync(long id ,ProductUpdateDTO input )
+        {
+            try
+            {
+                var existingProduct = await _repository.GetByIdAsync(id);
+                if (existingProduct == null)
+                {
+                    // Lança a exceção corretamente, em vez de tentar retornar ela
+                    throw new KeyNotFoundException($"Produto com ID {id} não encontrado.");
+                }
 
+                // Mapeia os dados do DTO para a entidade existente
+                _mapper.Map(input, existingProduct);
 
+                // Atualiza o produto no repositório
+                 await _repository.UpdateAsync(id, existingProduct);
+
+                // Retorna uma resposta de sucesso (HTTP 200) com o produto atualizado
+                
+            }
+            catch (KeyNotFoundException ex)
+            {
+                throw new KeyNotFoundException(ex.Message);
+            }
+           
+        }
+        public void DeleteAsync(long id)
+        {
+            try
+            {
+                _repository.DeleteAsync(id);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                throw new InvalidOperationException("A entidade com o ID fornecido não foi encontrada.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Falha ao tentar deletar a entidade.", ex);
+            }
+        }
     }
 }

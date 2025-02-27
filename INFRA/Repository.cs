@@ -41,40 +41,24 @@ namespace INFRA
             return _context.Set<T>().FindAsync(id).AsTask();
         }
 
-        public Task UpdateAsync(T entity)
+        public async Task UpdateAsync( long id, T entity)
         {
-            // Assumindo que T tem uma propriedade Id do tipo long
-            var keyProperty = typeof(T).GetProperty("Id");
-            if (keyProperty == null)
+            var existingEntity = await _context.Set<T>().FindAsync(id);
+
+            if (existingEntity == null)
             {
-                throw new InvalidOperationException("Entity does not have an 'Id' property.");
+                throw new KeyNotFoundException($"Entidade com ID {id} não encontrada.");
             }
 
-            var itemId = (long)keyProperty.GetValue(entity); // Converta para long, ajustando conforme o tipo da chave
-            var result = dbSet.Find(itemId); // Use Find para obter a entidade com base no ID
+            _context.Update(entity);
+            await _context.SaveChangesAsync();
 
-            if (result != null)
-            {
-                try
-                {
-                    _context.Entry(result).CurrentValues.SetValues(entity);
-                    _context.SaveChanges();
-                    return entity;
-                }
-                catch (Exception ex)
-                {
-                    // Consider logging the exception
-                    throw new InvalidOperationException("Update operation failed.", ex);
-                }
-            }
-            else
-            {
-                throw new KeyNotFoundException("Entity with the given Id was not found.");
-            }
         } 
-        public Task DeleteAsync(long id)
+        public void DeleteAsync(long id)
         {
-            throw new NotImplementedException();
+            var entity = dbSet.SingleOrDefault(e => EF.Property<long>(e, "Id") == id);
+            dbSet.Remove(entity);
+            _context.SaveChanges();
         }
     }
 }

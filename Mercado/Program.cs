@@ -22,6 +22,8 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 builder.Services.AddScoped<IProductService, ProductService>();
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 // configurar serviços, registrar dependências e definir configurações
 var app = builder.Build();
 

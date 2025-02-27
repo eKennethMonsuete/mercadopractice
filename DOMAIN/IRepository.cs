@@ -12,7 +12,7 @@ namespace DOMAIN
         Task<T> AddAsync(T entity);
         Task<T?> GetByIdAsync(long id);
         Task<IEnumerable<T>> GetAllAsync();
-        Task UpdateAsync(T entity);
-        Task DeleteAsync(long id);
+        Task UpdateAsync( long id, T entity);
+        void DeleteAsync(long id);
     }
 }

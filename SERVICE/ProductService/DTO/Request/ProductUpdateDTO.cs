@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SERVICE.ProductService.DTO.Response
+namespace SERVICE.ProductService.DTO.Request
 {
-    public class ProductCreateResponseDTO
+   public class ProductUpdateDTO
     {
-       
+        
 
         public string Name { get; set; }
 
